@@ -1,6 +1,6 @@
 import torch
 
-class VPSDE(bmin=0.1, bmax=20):
+class VPSDE():
     def __init__(self, bmin=0.1, bmax=20):
         self.bmin = bmin
         self.bmax = bmax
