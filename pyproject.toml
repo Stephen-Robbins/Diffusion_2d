@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diffusion_2d"
+version = "0.1.0"
+description = "Toy 2D score-based diffusion models"
+authors = [{name = "Your Name"}]
+requires-python = ">=3.10"
+dependencies = ["torch", "numpy", "tqdm"]

@@ -1,4 +1,5 @@
-# model.py
+"""Simple score network used for 2D diffusion experiments."""
+
 import torch
 import torch.nn as nn
 
@@ -11,8 +12,9 @@ else:
 print(f"Using device: {device}")
 
 class ScoreNet(nn.Module):
-    """A simple Multi-Layer Perceptron to estimate the score."""
-    def __init__(self, input_dim=2, hidden_dim=256, time_dim=256):
+    """Multi-layer perceptron estimating the score of noisy data."""
+
+    def __init__(self, input_dim: int = 2, hidden_dim: int = 256, time_dim: int = 256):
         super().__init__()
 
         # Time embedding
@@ -30,9 +32,9 @@ class ScoreNet(nn.Module):
             nn.Linear(hidden_dim, input_dim)
         )
 
-    def forward(self, x, t):
-        # Time embedding
+    def forward(self, x: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
+        """Evaluate the network at data ``x`` and time ``t``."""
+
         time_embedding = self.time_mlp(t)
-        # Concatenate time embedding with input
         x_t = torch.cat([x, time_embedding], dim=-1)
         return self.net(x_t)
