@@ -1,6 +1,10 @@
+"""Training utilities for score-based diffusion models."""
+
+from typing import List, Optional
+
 import torch
 import numpy as np
-from tqdm.auto import tqdm  # Import tqdm for progress bars
+from tqdm.auto import tqdm
 import os
 from sde import VPSDE
 
@@ -17,10 +21,18 @@ sde=VPSDE()
 
 
 
-def score_matching_loss(score_net1,  x,  t):
-    """
+def score_matching_loss(
+    score_net1: torch.nn.Module, x: torch.Tensor, t: torch.Tensor
+) -> torch.Tensor:
+    """Compute denoising score matching loss.
+
+    Args:
+        score_net1: Score network to train.
+        x: Batch of clean samples.
+        t: Diffusion times for each sample.
+
     Returns:
-        The score matching loss.
+        Scalar loss tensor.
     """
     # Get mean and standard deviation for the forward diffusion on each input
     mean, std = sde.p(x, t)
@@ -39,17 +51,32 @@ def score_matching_loss(score_net1,  x,  t):
     
     return loss
 
-def train_diffusion_model(data_x, 
-                              score_net1, 
-                              optimizer, 
-                              num_diffusion_timesteps,
-                              batch_size, 
-                              num_epochs, 
-                              device, 
-                              checkpoint_path=None,
-                              save_every=100):
-    """
+def train_diffusion_model(
+    data_x: torch.Tensor,
+    score_net1: torch.nn.Module,
+    optimizer: torch.optim.Optimizer,
+    num_diffusion_timesteps: int,
+    batch_size: int,
+    num_epochs: int,
+    device: torch.device,
+    checkpoint_path: Optional[str] = None,
+    save_every: int = 100,
+) -> List[float]:
+    """Train a score network on a dataset.
 
+    Args:
+        data_x: Training samples.
+        score_net1: Score network to optimize.
+        optimizer: Torch optimizer instance.
+        num_diffusion_timesteps: Number of diffusion steps.
+        batch_size: Training batch size.
+        num_epochs: Number of passes over the dataset.
+        device: Execution device.
+        checkpoint_path: Optional path to save checkpoints.
+        save_every: Epoch interval for checkpointing.
+
+    Returns:
+        List of average loss values per epoch.
     """
     # Set both networks to training mode
     score_net1.train()

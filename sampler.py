@@ -1,4 +1,6 @@
 # sampler.py
+"""Utilities for sampling from a trained diffusion model."""
+
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -13,27 +15,24 @@ else:
 print(f"Using device: {device}")
 
 sde=VPSDE()
-def reverse_sde_sampling(score_net1, 
-                         num_samples, 
-                         num_diffusion_timesteps, 
-                         device, 
-                         x_shape=(2,)):
-    """
-    Samples from the learned distribution using the reverse-time SDE in x-space,
-    with the score defined as the average of two trained score networks:
-    
-        score(x, t) = 1/2 * (score_net1(x, t) + score_net2(x, t))
-    
-    The SDE is solved using Euler–Maruyama discretization.
-    
-    Arguments:
-        score_net1: The first trained score model.
-        num_samples: Number of samples to generate.
-        num_diffusion_timesteps: Number of timesteps in the reverse SDE.
-        device: Torch device.
-        x_shape: The shape of each sample (default is (2,) for 2D data).
+def reverse_sde_sampling(
+    score_net1: torch.nn.Module,
+    num_samples: int,
+    num_diffusion_timesteps: int,
+    device: torch.device,
+    x_shape: tuple[int, ...] = (2,),
+) -> torch.Tensor:
+    """Sample from the model by integrating the reverse SDE.
+
+    Args:
+        score_net1: Trained score network.
+        num_samples: Number of points to generate.
+        num_diffusion_timesteps: Number of discretization steps.
+        device: Execution device.
+        x_shape: Shape of each generated sample.
+
     Returns:
-        A tensor of generated samples in x-space.
+        Tensor of generated samples in data space.
     """
     # Initialize x from the prior (typically a standard normal)
     x = torch.randn((num_samples, *x_shape), device=device)
